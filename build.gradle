@@ -1,7 +1,7 @@
 plugins {
-	id 'org.springframework.boot' version '2.7.4'
-	id 'io.spring.dependency-management' version '1.0.14.RELEASE'
-	id 'java'
+    id 'org.springframework.boot' version '2.7.4'
+    id 'io.spring.dependency-management' version '1.0.14.RELEASE'
+    id 'java'
 }
 
 group = 'com.arydz'
@@ -9,32 +9,42 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '15'
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
 
-	// Spring
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
+    // Spring
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
-	// SQL
-	runtimeOnly 'org.postgresql:postgresql'
+    // SQL
+    implementation 'org.postgresql:postgresql:42.5.0'
 
-	// Utils
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
+    // Utils
+    implementation 'com.googlecode.jmapper-framework:jmapper-core:1.6.1.CR2'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
 
-	// Tests
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    // Tests
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'com.github.tomakehurst:wiremock:2.27.2'
+    testImplementation 'org.assertj:assertj-core:3.23.1'
+    testImplementation 'org.springframework.cloud:spring-cloud-starter-openfeign:3.1.4'
+    testImplementation 'org.testcontainers:junit-jupiter:1.17.5'
+    testImplementation 'org.testcontainers:postgresql:1.17.5'
+    testImplementation 'io.projectreactor:reactor-test:3.4.23'
+
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
