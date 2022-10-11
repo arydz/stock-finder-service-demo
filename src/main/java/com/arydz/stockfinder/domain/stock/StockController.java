@@ -1,6 +1,7 @@
 package com.arydz.stockfinder.domain.stock;
 
 import com.arydz.stockfinder.domain.stock.model.Stock;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,11 +19,13 @@ public class StockController {
     private final StockService service;
 
     @PostMapping
+    @Operation(summary = "Import company data from external vendor")
     public Mono<String> importStocks() {
         return service.importStocks();
     }
 
     @GetMapping
+    @Operation(summary = "Get company data in pages, stored in a database")
     public Mono<Page<Stock>> getAllStocks(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "50") int size) {
 
         return service.findAll(page, size);
