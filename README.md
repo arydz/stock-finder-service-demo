@@ -37,24 +37,24 @@ SPARK_HOME="/home/${user}/utils/spark-3.3.0-bin-hadoop3"
 PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:$JAVA_HOME/bin:$GRADLE_HOME/bin:$SPARK_HOME/bin"
 ```
 Where $SPARK_HOME is required when working with gradle scripts and docker
-
-
-### 1.3 Run Docker containers
-Required environment variables (PC restart might be required):
+Required (for Docker) environment variables (PC restart might be required):
+```text
 - `POSTGRES_PASSWORD` for Postgres
 - `PGADMIN_DEFAULT_PASSWORD` for PGadmin
-In the command line run
-`docker compose up`
+```
 
-### 1.4 Login to PgAdmin (optional)
+### 1.3 Login to PgAdmin (optional)
 - Open http://localhost:5454/browser/ in browser
 - Login with a credentials: `sf_admin@stockfinder.com` and password setup in your env variable `PGADMIN_DEFAULT_PASSWORD` (1.3 point)
 - Choose `Add New Server`, new wizard window will be shown
 - In general tab provide: `Name: Stock Finder` (or whatever you want)
 - In connection tab provide: `Host: postgres`, `Maintenance database: stock_finder` `User name: sf_admin`, `Password: -password from POSTGRES_PASSWORD variable-`
 - Click on `Save` button
-- From available databases select `stock_finder` 
+- From available databases select `stock_finder`
 
+### 1.4 Swagger
+Go to: `http://localhost:8080/webjars/swagger-ui/index.html`
+Dockerized
 # 2. Technical description
 
 ### 2.1 Project structure
@@ -73,13 +73,76 @@ JMapper achieves high-performance results since it applies a number of optimizat
 It provides easy-to-use feature mappings (annotation-based, config classes, or XML files). Because of its nature, some problems during debugging can occurs. 
 https://github.com/jmapper-framework/jmapper-core/wiki
 
-### 2.3 Webflux
+### 2.3 Docker approach
+Docker in version 20.10.17 is used.<br>
+This project consist of multiple docker-compose.yaml files:
+- `docker-compose.infrastructure.yaml` is for preparing database containers, and network
+- `docker-compose.yaml` is only about creating the Stock Finder demo container
+  Instead of multiple files, `Docker Profiles` could be used.
+  For example:
+```yaml
+services:
+  mq:
+    ports:
+      - 10:10
+  db:
+    profiles: ["db"]
+    ports:
+      - 1234:1234
+  app:
+    profiles: ["app"]
+    ports:
+      - 8080:8080
+```
+Then these commands will result in:<br>
+This command will start the **mq and database** service `docker-compose --profile db up` <br>
+This command will start the **mq and app** service `docker-compose --profile app up`<br>
+This command will start the **app** service `docker-compose run app` <br>
+This command will start only your **mq** service `docker-compose up`
+
+### 2.3.1 Docker network
+All services are in the scope of the same (custom) network. Static IP addresses are used.
+
+#### 2.3.2 Build images and run Docker containers
+First, build the application and generate a docker image with this command:
+- `gradle clean build`
+- `gradle jibDockerBuild -Djib.container.jvmFlags=-Dsf.database.host="<some-host>",-Dspring.datasource.password="<database-password>"`
+  - thanks to that, those properties don't have to be put in container closure:
+  ```text
+      container {
+        jvmFlags = ['-Dsf.database.host=<some-host>', '-Dspring.datasource.password=<database-password>']
+        creationTime = 'USE_CURRENT_TIMESTAMP'
+      }
+  ```
+  - so, it mitigates the risk of pushing sensitive data (like passwords) into the code repository
+The image will be pushed to your **local** docker image repository
+Next, execute in this order (go to docker folder):
+- `docker compose -f docker-compose.infrastructure.yaml up`
+- `docker compose up`
+
+#### 2.3.3 Dangling images
+When generating new images for docker, for example with existing **tag**, a dangling image with the name <none> can occur. Is without a tag, an unused image not referenced by any container.
+When using **Google Jib plugin**, images can be generated with tags in at least three ways:
+- in `to` closure, adding `tags = ["version-1"]` properties will cause in generating two images with tags: `latest` and `version-1`
+  - but, when a generation of the image with the `version-1` tag will be required, then it can cause generating a dangling image (with <none> name).
+- instead of that, also in `to` closure, tag can be defined in directly in a name property: `image = "repo/${project.name}:version-1"`
+  - this will cause the generation of only one image with the tag `version-1`
+- currently in this project, the default tag approach is used: `image = "repo/${project.name}"`
+  - this will cause the generation of one image with the tag `latest` and a dangling image (with <none> name).
+
+#### 2.3.4 How to remove dangling images
+Simply, use this command: `docker image prune`
+
+### 2.4 Google Jib
+**Google Jib** is a plugin for Gradle, Maven, etc. Is used for building images without Dockerfile, and it doesn't need the installation of Docker.
+
+### 2.5 Webflux
 Provides reactive features for web applications development. It's based on non-blocking reactive streams,
 supports back pressure (subscriber informs the publisher about required by it the pace of producing data).
 So when the subscriber cannot consume the received amount of data, signals the publisher to emit fewer elements.
 **A good solution for overwhelmed services.**
 
-### 2.4 Tests
+### 2.6 Tests
 This project is covered by unit and integration tests. 
 - Library `spring-cloud-starter-openfeign` is used to provide a ready implementation of the page and sort objects that helps parse JSON
 - Postgres `testcontainers` provides ready SQL databases for integration tests only. This gives the ability to fully verify the behavior of native queries. For example, the H2 database doesn't support some of Postgres features.  

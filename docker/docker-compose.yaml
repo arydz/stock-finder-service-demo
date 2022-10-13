@@ -1,47 +1,14 @@
-version: "3.1"
+version: "3.9"
 
 services:
-  postgres:
-    image: postgres
-    restart: always
+  sf-demo:
+    image: stock-finder-service-demo
     networks:
       stock_finder_net:
-        ipv4_address: 172.28.1.1
-    environment:
-      - POSTGRES_DB=stock_finder
-      - POSTGRES_USER=sf_admin
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_HOST_AUTH_METHOD=trust # Should be disabled for prod
-    volumes:
-      - ../db/init:/docker-entrypoint-initdb.d
-      - pgdata:/var/lib/postgresql/data/
+        ipv4_address: 172.28.1.3
     ports:
-      - "5432:5432"
-
-  pgadmin:
-    image: dpage/pgadmin4
-    restart: always
-    networks:
-      stock_finder_net:
-        ipv4_address: 172.28.1.2
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=sf_admin@stockfinder.com
-      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
-      - PGADMIN_LISTEN_PORT=5454
-    ports:
-      - 5454:5454/tcp
-    volumes:
-      - pgadmindata:/var/lib/pgadmin
-    depends_on:
-      - postgres
-
-volumes:
-  pgdata:
-  pgadmindata:
+      - "8080:8080"
 
 networks:
   stock_finder_net:
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.28.0.0/16
+    external: true
