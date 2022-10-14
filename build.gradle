@@ -40,6 +40,7 @@ dependencies {
 
     // SQL
     implementation 'org.postgresql:postgresql:42.5.0'
+    implementation "org.flywaydb:flyway-core:9.4.0"
 
     // Utils
     implementation 'com.googlecode.jmapper-framework:jmapper-core:1.6.1.CR2'

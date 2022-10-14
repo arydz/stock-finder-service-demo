@@ -146,3 +146,7 @@ So when the subscriber cannot consume the received amount of data, signals the p
 This project is covered by unit and integration tests. 
 - Library `spring-cloud-starter-openfeign` is used to provide a ready implementation of the page and sort objects that helps parse JSON
 - Postgres `testcontainers` provides ready SQL databases for integration tests only. This gives the ability to fully verify the behavior of native queries. For example, the H2 database doesn't support some of Postgres features.  
+
+### 2.6 Flyway
+Is a version control for databases, helpful with migration (can be done in SQL and Java).
+Since this project already has initialized database, the next SQL script has to have a name with the `V2__` prefix. 
