@@ -44,7 +44,7 @@ class StockControllerIT extends BaseIntegrationTest {
     private StockRepository repository;
 
     @Test
-    void shouldReturnStockList() throws JsonProcessingException {
+    void shouldReturnStockList() throws JsonProcessingException, InterruptedException {
 
         // given
         String url = String.format("http://localhost:%s%s", port, "/api/stock?page=0&size=20");
@@ -86,11 +86,11 @@ class StockControllerIT extends BaseIntegrationTest {
 
     private static Stream<Arguments> provideStockTickers() {
         return Stream.of(
-                /* ST3 is new stock, ST1 already exist in DB */
+                // ST3 is new stock, ST1 already exist in DB
                 Arguments.of("{\"0\":{\"cik_str\":1,\"ticker\":\"ST1\",\"title\":\"Stock 1\"},\"1\":{\"cik_str\":2,\"ticker\":\"ST3\",\"title\":\"Stock 3\"}}", 3),
-                /* ST1 & ST2 already exist in DB */
+                // ST1 & ST2 already exist in DB
                 Arguments.of("{\"0\":{\"cik_str\":1,\"ticker\":\"ST1\",\"title\":\"Stock 1\"},\"1\":{\"cik_str\":2,\"ticker\":\"ST2\",\"title\":\"Stock 2\"}}", 2),
-                /* Nothing to add, ST1 & ST2 already exist in DB */
+                // Nothing to add, ST1 & ST2 already exist in DB
                 Arguments.of("{}", 2)
         );
     }
