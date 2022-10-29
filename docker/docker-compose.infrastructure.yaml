@@ -29,11 +29,27 @@ services:
       - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
       - PGADMIN_LISTEN_PORT=5454
     ports:
-      - 5454:5454/tcp
+      - "5454:5454/tcp"
     volumes:
       - pgadmindata:/var/lib/pgadmin
     depends_on:
       - postgres
+
+  jenkins:
+    image: jenkins/jenkins:latest-jdk17
+    privileged: true
+    user: root
+    restart: always
+    ports:
+      - "8090:8080"
+      - "50000:50000"
+    volumes:
+      - ${JENKINS_HOME}/jenkins_configuration:/var/jenkins_home
+      - /usr/bin/docker:/usr/bin/docker
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - TESTCONTAINERS_RYUK_DISABLED=true
+    network_mode: bridge
 
 volumes:
   pgdata:

@@ -101,7 +101,7 @@ This command will start the **app** service `docker-compose run app` <br>
 This command will start only your **mq** service `docker-compose up`
 
 ### 2.3.1 Docker network
-All services are in the scope of the same (custom) network. Static IP addresses are used.
+All services are in the scope of the same (custom) network (apart from Jenkins and testcontainers). Static IP addresses are used.
 
 #### 2.3.2 Build images and run Docker containers
 First, build the application and generate a docker image with this command:
@@ -133,6 +133,87 @@ When using **Google Jib plugin**, images can be generated with tags in at least 
 #### 2.3.4 How to remove dangling images
 Simply, use this command: `docker image prune`
 
+#### 2.3.5 Briefly about Docker Socket (not suggested)
+It's a UNIX socket, which is used by Docker to listen to containers, so it exposes the Docker API (**it causes high-security risk**)
+Docker socket is configured by:
+```yaml
+services:
+  container-name:
+    image: some-image
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+```
+It gives us the benefit of managing Docker (Daemon) via container.
+Main Docker Daemon is directly managing images from dockerized Jenkins.
+**This approach was chosen for this project, because "easy of use".** 
+
+#### 2.3.6 Docker in Docker instead of Docker Socket
+When security is important it's better to use Docker-in-Docker approach. It isolates Jenkins container from host.
+```yaml
+services:
+  dind:
+      image: docker:dind
+      expose:
+        - 2375
+      networks:
+        - jenkins_net
+
+  jenkins:
+    image: jenkins/jenkins:lts
+    environment:
+      DOCKER_HOST: "tcp://dind:2375"
+    networks:
+      - jenkins_net
+
+networks:
+  jenkins_net:
+    driver: bridge
+```
+If container is privileged, it's good to enable the use of TLS in the Docker server.
+```yaml
+services:
+  container-name:
+    image: some-image
+    environment:
+      - DOCKER_TLS_CERTDIR=/certs
+```
+It requires creating the volume to share the Docker client TLS certificates needed to connect to the Docker and persist data.
+```yaml
+services:
+  container-name:
+    image: some-image
+    volumes:
+      - docker-certs:/certs/client
+  
+volumes:
+  docker-certs:
+```
+
+### 2.3.7 Example docker-compose configurations to play with
+```yaml
+services:
+    linux-simple:
+        image: ubuntu:latest
+        privileged: true
+        tty: true
+        stdin_open: true
+        volumes:
+        - D:/ubuntu/simple-test:/home/test
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /usr/local/bin/docker:/usr/local/bin/docker
+        environment:
+        - TESTCONTAINERS_RYUK_DISABLED=true
+        network_mode: bridge
+    
+    gradle-java:
+        image: gradle:jdk15
+        privileged: true
+        tty: true
+        stdin_open: true
+        network_mode: bridge
+        entrypoint: /bin/sh
+```
+
 ### 2.4 Google Jib
 **Google Jib** is a plugin for Gradle, Maven, etc. Is used for building images without Dockerfile, and it doesn't need the installation of Docker.
 
@@ -146,6 +227,24 @@ So when the subscriber cannot consume the received amount of data, signals the p
 This project is covered by unit and integration tests. 
 - Library `spring-cloud-starter-openfeign` is used to provide a ready implementation of the page and sort objects that helps parse JSON
 - Postgres `testcontainers` provides ready SQL databases for integration tests only. This gives the ability to fully verify the behavior of native queries. For example, the H2 database doesn't support some of Postgres features.  
+
+#### 2.6.1 Testcontainers with Jenkins on local Docker
+When running Jenkins on Docker, custom network for Jenkins container will be created as default. This will makes not possible to run integration tests that need to connect with Testcontainers.
+This is why:
+- Jenkins container uses **bridge** `network_mode`. Thanks to that, it's in same network as Postgres from Testcontainers
+- In `BaseIntegrationTest`, connection to the database is prepared, depending on the host
+  - if tests are running locally, then the URL connection is based on localhost and mapped port
+  - if tests are running on Jenkins, then the URL connection is based on Testcontainers IP and exposed port.
+    - method `container.container.getJdbcUrl()`, will return connection string, built with a gateway address 
+
+Testcontainers challenges (version 1.17.5):
+- it's not possible to use a custom network (declared for example in docker-compose.yaml file) with Testcontainers. Testcontainers work only with bridge network 
+  ```java
+    @ClassRule
+    public static DockerComposeContainer environment = new DockerComposeContainer(new File("src/test/resources/docker-compose.test.yml")) 
+  ```
+- there is an option to extend the `Network` interface and implement an appropriate class that might use existing network **(not verified)**
+- Testcontainers doesn't support some docker-compose features (can't name a container)
 
 ### 2.6 Flyway
 Is a version control for databases, helpful with migration (can be done in SQL and Java).
