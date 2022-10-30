@@ -13,6 +13,8 @@ import javax.transaction.Transactional;
 import java.sql.PreparedStatement;
 import java.util.List;
 
+import static java.lang.String.format;
+
 @Repository
 @RequiredArgsConstructor
 class StockDao {
@@ -29,6 +31,10 @@ class StockDao {
 
     @Transactional
     public void saveAll(List<StockEntity> entityList) {
+
+        if (batchSize <= 0) {
+            throw new IllegalArgumentException(format("Batch size is %s. Batch processing can't be disabled.", batchSize));
+        }
 
         String upsertQuery = sqlUtils.prepareUpsert("STOCK", stockTableDefinition, EXCLUDED_STOCK_FIELDS);
 
