@@ -166,3 +166,7 @@ R2DBC also supports pagination with sorting, and batching.
         .map(entityPages->entityPages.map(stockMapper::mapEntityToStock));
         }
 ```
+
+## Batch size value
+This project illustrates the usage of bulk inserts, but the suggested value of 250 batch size can be overkill for production applications.
+Bigger batch size values require bigger RAM availability. The Hibernate Community recommendation is between 10 and 50.
