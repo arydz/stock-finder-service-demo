@@ -55,7 +55,6 @@ class StockService {
     public Mono<Page<Stock>> findAll(int page, int size) {
 
         log.info("About to find all stocks for page {} and size of page {}", page, size);
-
         return Mono.just(PageRequest.of(page, size))
                 .map(repository::findAll)
                 .map(entityPages -> entityPages.map(stockMapper::mapEntityToStock));

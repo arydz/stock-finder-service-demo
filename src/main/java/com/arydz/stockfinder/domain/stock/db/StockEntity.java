@@ -1,6 +1,6 @@
 package com.arydz.stockfinder.domain.stock.db;
 
-import com.arydz.stockfinder.domain.marketindex.MarketIndexEntity;
+import com.arydz.stockfinder.domain.dictionary.model.MarketIndexEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
