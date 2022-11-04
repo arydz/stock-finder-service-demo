@@ -1,4 +1,4 @@
-package com.arydz.stockfinder.domain.marketindex;
+package com.arydz.stockfinder.domain.dictionary.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

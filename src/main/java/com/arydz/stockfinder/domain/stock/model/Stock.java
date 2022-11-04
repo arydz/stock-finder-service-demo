@@ -1,6 +1,6 @@
 package com.arydz.stockfinder.domain.stock.model;
 
-import com.arydz.stockfinder.domain.marketindex.MarketIndexEntity;
+import com.arydz.stockfinder.domain.dictionary.model.MarketIndexEntity;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.googlecode.jmapper.annotations.JMap;
 import com.googlecode.jmapper.annotations.JMapConversion;
