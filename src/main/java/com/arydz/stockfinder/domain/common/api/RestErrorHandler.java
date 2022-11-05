@@ -1,4 +1,4 @@
-package com.arydz.stockfinder.domain.common;
+package com.arydz.stockfinder.domain.common.api;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;

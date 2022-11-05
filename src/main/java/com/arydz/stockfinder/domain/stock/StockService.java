@@ -3,11 +3,13 @@ package com.arydz.stockfinder.domain.stock;
 import com.arydz.stockfinder.domain.common.EdgarClient;
 import com.arydz.stockfinder.domain.stock.db.StockEntity;
 import com.arydz.stockfinder.domain.stock.model.EdgarStock;
+import com.arydz.stockfinder.domain.stock.model.FilterStockParams;
 import com.arydz.stockfinder.domain.stock.model.Stock;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -52,11 +54,20 @@ class StockService {
         return String.format(IMPORT_STOCKS_MESSAGE, size);
     }
 
-    public Mono<Page<Stock>> findAll(int page, int size) {
+    public Mono<Page<Stock>> findAll(FilterStockParams params) {
 
-        log.info("About to find all stocks for page {} and size of page {}", page, size);
-        return Mono.just(PageRequest.of(page, size))
-                .map(repository::findAll)
+
+        int page = params.getPage();
+        int size = params.getSize();
+        Sort sort = Sort.by(params.getSortDirection(), params.getSortColumn());
+
+        log.info("About to find all stocks for page {}, size of page {}, sort by {} and direction {}", page, size, params.getSortColumn(), params.getSortDirection());
+        return Mono.just(PageRequest.of(page, size, sort))
+                .map( pageRequest -> {
+                    String ticker = params.getTicker();
+                    String title = params.getTitle();
+                    return repository.findAll(ticker, title, pageRequest);
+                })
                 .map(entityPages -> entityPages.map(stockMapper::mapEntityToStock));
     }
 }
