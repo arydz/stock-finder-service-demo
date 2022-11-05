@@ -1,4 +1,4 @@
-package com.arydz.stockfinder.domain.common;
+package com.arydz.stockfinder.domain.common.db;
 
 
 import org.apache.commons.lang3.StringUtils;

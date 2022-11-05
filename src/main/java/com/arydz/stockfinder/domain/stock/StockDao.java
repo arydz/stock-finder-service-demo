@@ -1,6 +1,6 @@
 package com.arydz.stockfinder.domain.stock;
 
-import com.arydz.stockfinder.domain.common.SqlUtils;
+import com.arydz.stockfinder.domain.common.db.SqlUtils;
 import com.arydz.stockfinder.domain.stock.db.StockEntity;
 import com.arydz.stockfinder.domain.stock.db.StockFields;
 import com.arydz.stockfinder.domain.stock.db.StockTableDefinition;

@@ -3,7 +3,9 @@ package com.arydz.stockfinder.domain.stock;
 import com.arydz.stockfinder.domain.common.EdgarClient;
 import com.arydz.stockfinder.domain.stock.db.StockEntity;
 import com.arydz.stockfinder.domain.stock.model.EdgarStock;
+import com.arydz.stockfinder.domain.stock.model.FilterStockParams;
 import com.arydz.stockfinder.domain.stock.model.Stock;
+import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,12 +14,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static reactor.core.publisher.Mono.just;
@@ -63,11 +67,12 @@ class StockServiceTest {
         // given
         List<StockEntity> edgarStockList = List.of(new StockEntity(1L, "ST1", "Stock 1", 1, null));
         PageImpl<StockEntity> stockEntityPage = new PageImpl<>(edgarStockList);
-        when(repository.findAll(any(Pageable.class))).thenReturn(stockEntityPage);
+        when(repository.findAll(anyString(), anyString(), any(Pageable.class))).thenReturn(stockEntityPage);
         Stock expectedStock = Stock.builder().id(1L).ticker("ST1").title("Stock 1").build();
         when(stockMapper.mapEntityToStock(any())).thenReturn(expectedStock);
+        FilterStockParams params = new FilterStockParams(StringUtils.EMPTY, StringUtils.EMPTY, 0, 1, "id", Sort.Direction.ASC);
         // when
-        Mono<Page<Stock>> response = stockService.findAll(0, 1);
+        Mono<Page<Stock>> response = stockService.findAll(params);
 
         // then
         StepVerifier.create(response)

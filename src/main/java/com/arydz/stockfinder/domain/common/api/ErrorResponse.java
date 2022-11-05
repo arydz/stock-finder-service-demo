@@ -1,4 +1,4 @@
-package com.arydz.stockfinder.domain.common;
+package com.arydz.stockfinder.domain.common.api;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

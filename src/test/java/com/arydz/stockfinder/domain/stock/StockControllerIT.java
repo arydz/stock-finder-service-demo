@@ -44,10 +44,10 @@ class StockControllerIT extends BaseIntegrationTest {
     private StockRepository repository;
 
     @Test
-    void shouldReturnStockList() throws JsonProcessingException, InterruptedException {
+    void shouldReturnStockList() throws JsonProcessingException {
 
         // given
-        String url = String.format("http://localhost:%s%s", port, "/api/stock?page=0&size=20");
+        String url = String.format("http://localhost:%s%s", port, "/api/stock?page=0&size=20&sortColumn=id&sortDirection=ASC");
 
         // when
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);

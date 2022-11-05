@@ -1,6 +1,6 @@
 package com.arydz.stockfinder.domain.stock.db;
 
-import com.arydz.stockfinder.domain.common.TableDefinition;
+import com.arydz.stockfinder.domain.common.db.TableDefinition;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
