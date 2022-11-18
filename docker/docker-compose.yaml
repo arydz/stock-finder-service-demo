@@ -1,13 +1,21 @@
 version: "3.9"
 
 services:
-  sf-demo:
+  sf-service-demo:
     image: stock-finder-service-demo
     networks:
       stock_finder_net:
         ipv4_address: 172.28.1.3
     ports:
       - "8080:8080"
+
+  sf-web-demo:
+      image: stock-finder-webapp-demo
+      ports:
+        - "4200:4200"
+      networks:
+        stock_finder_net:
+          ipv4_address: 172.28.1.4
 
 networks:
   stock_finder_net:
