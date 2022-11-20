@@ -54,7 +54,7 @@ Required (for Docker) environment variables (PC restart might be required):
 
 ### 1.4 Swagger
 Go to: `http://localhost:8080/webjars/swagger-ui/index.html`
-Dockerized
+
 # 2. Technical description
 
 ### 2.1 Project structure

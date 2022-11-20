@@ -73,7 +73,7 @@ Add to docker-compose file:
      - `Private Key` select Enter directly
      - Now provide contents of jenkins_file
      - Click `Create`
-2. Add Jenkins agent should be defined in docker compose file
+2. Jenkins agent should be defined in docker compose file
    - copy content of jenkins_file.pub into an environment variable (for example `$JENKINS_AGENT_SSH_PUBKEY`)
       ```yaml
           environment:
