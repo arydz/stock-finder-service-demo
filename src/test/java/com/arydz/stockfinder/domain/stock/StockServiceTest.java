@@ -1,9 +1,11 @@
 package com.arydz.stockfinder.domain.stock;
 
 import com.arydz.stockfinder.domain.common.EdgarClient;
+import com.arydz.stockfinder.domain.dictionary.DictionaryService;
+import com.arydz.stockfinder.domain.file.FileService;
+import com.arydz.stockfinder.domain.stock.api.FilterStockParams;
 import com.arydz.stockfinder.domain.stock.db.StockEntity;
 import com.arydz.stockfinder.domain.stock.model.EdgarStock;
-import com.arydz.stockfinder.domain.stock.model.FilterStockParams;
 import com.arydz.stockfinder.domain.stock.model.Stock;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
@@ -42,7 +44,9 @@ class StockServiceTest {
         stockMapper = mock(StockMapper.class);
         StockDao dao = mock(StockDao.class);
         repository = mock(StockRepository.class);
-        stockService = new StockService(edgarClient, stockMapper, dao, repository);
+        DictionaryService dictionaryService = mock(DictionaryService.class);
+        FileService fileService = mock(FileService.class);
+        stockService = new StockService(edgarClient, stockMapper, dao, repository, dictionaryService, fileService);
     }
 
     @Test
@@ -71,6 +75,7 @@ class StockServiceTest {
         Stock expectedStock = Stock.builder().id(1L).ticker("ST1").title("Stock 1").build();
         when(stockMapper.mapEntityToStock(any())).thenReturn(expectedStock);
         FilterStockParams params = new FilterStockParams(StringUtils.EMPTY, StringUtils.EMPTY, 0, 1, "id", Sort.Direction.ASC);
+
         // when
         Mono<Page<Stock>> response = stockService.findAll(params);
 

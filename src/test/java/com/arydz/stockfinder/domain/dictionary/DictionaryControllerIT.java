@@ -6,15 +6,17 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.web.reactive.server.FluxExchangeResult;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class DictionaryControllerIT extends BaseIntegrationTest {
@@ -23,7 +25,7 @@ class DictionaryControllerIT extends BaseIntegrationTest {
     private String port;
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private WebTestClient webClient;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -32,14 +34,20 @@ class DictionaryControllerIT extends BaseIntegrationTest {
     void shouldReturnMarketIndexNameList() throws JsonProcessingException {
 
         // given
-        String url = String.format("http://localhost:%s%s", port, "/api/dictionary/marketIndexName");
+        String url = String.format(WEB_URL_PATTERN, port, "/api/dictionary/marketIndexName");
 
         // when
-        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+        FluxExchangeResult<String> result = this.webClient
+                .get()
+                .uri(url)
+                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                .exchange()
+                .returnResult(String.class);
 
         // then
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        String jsonResponse = response.getBody();
+        HttpStatus httpStatus = result.getStatus();
+        assertThat(httpStatus).isEqualTo(HttpStatus.OK);
+        String jsonResponse = result.getResponseBody().blockFirst();
         assertThat(jsonResponse).isNotNull();
         List<String> marketIndexNameList = objectMapper.readValue(jsonResponse, new TypeReference<>() {
         });

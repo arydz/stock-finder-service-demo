@@ -1,6 +1,7 @@
 package com.arydz.stockfinder.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.arydz.stockfinder.domain.common.EnvProperties;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -10,17 +11,11 @@ import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
+@RequiredArgsConstructor
 @Profile(value = "!test")
 public class WebClientConfig implements WebFluxConfigurer {
 
-    @Value("${sf.allowed.origins}")
-    private String allowedOrigins;
-
-    @Value("${edgar.sec.base.url}")
-    private String edgarBaseUrl;
-
-    @Value("${sf.api.file.max-in-memory-size.mb}")
-    private int maxInMemorySizeMb;
+    private final EnvProperties properties;
 
     @Bean(name = "edgarWebClient")
     public WebClient edgarWebClient() {
@@ -29,7 +24,7 @@ public class WebClientConfig implements WebFluxConfigurer {
 
         return WebClient.builder()
                 .exchangeStrategies(exchangeStrategy)
-                .baseUrl(edgarBaseUrl)
+                .baseUrl(properties.getEdgarBaseUrl())
                 .build();
     }
 
@@ -37,7 +32,7 @@ public class WebClientConfig implements WebFluxConfigurer {
         return ExchangeStrategies.builder()
                 .codecs(configurer -> configurer
                         .defaultCodecs()
-                        .maxInMemorySize(maxInMemorySizeMb * 1024 * 1024))
+                        .maxInMemorySize(properties.getMaxInMemorySizeMb() * 1024 * 1024))
                 .build();
     }
 
@@ -45,6 +40,6 @@ public class WebClientConfig implements WebFluxConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedMethods("HEAD", "GET", "PUT", "POST", "DELETE", "PATCH")
-                .allowedOrigins(allowedOrigins);
+                .allowedOrigins(properties.getAllowedOrigins());
     }
 }

@@ -1,4 +1,4 @@
-package com.arydz.stockfinder.domain.stock.db;
+package com.arydz.stockfinder.domain.chart.db;
 
 import com.arydz.stockfinder.domain.common.db.TableDefinition;
 import org.springframework.stereotype.Component;
@@ -7,19 +7,19 @@ import java.util.List;
 import java.util.StringJoiner;
 
 @Component
-public final class StockTableDefinition implements TableDefinition<StockFields> {
+public final class ChartTableDefinition implements TableDefinition<ChartFields> {
 
     @Override
-    public String getColumnsWithUnnamedParametersSqlPart(List<StockFields> excludedColumns) {
+    public String getColumnsWithUnnamedParametersSqlPart(List<ChartFields> excludedColumns) {
         String columns = columnsDefinition(excludedColumns);
         String unnamedParameters = unnamedParametersDefinition(excludedColumns);
         return String.format("(%s) VALUES (%s)", columns, unnamedParameters);
     }
 
-    private String columnsDefinition(List<StockFields> excludedColumns) {
+    private String columnsDefinition(List<ChartFields> excludedColumns) {
 
         StringJoiner result = new StringJoiner(COLUMN_DELIMITER);
-        for (StockFields value : StockFields.values()) {
+        for (ChartFields value : ChartFields.values()) {
             if (!excludedColumns.contains(value)) {
                 result.add(value.name());
             }
@@ -27,10 +27,10 @@ public final class StockTableDefinition implements TableDefinition<StockFields> 
         return result.toString();
     }
 
-    private String unnamedParametersDefinition(List<StockFields> excludedColumns) {
+    private String unnamedParametersDefinition(List<ChartFields> excludedColumns) {
 
         StringJoiner result = new StringJoiner(COLUMN_DELIMITER);
-        for (StockFields value : StockFields.values()) {
+        for (ChartFields value : ChartFields.values()) {
             if (!excludedColumns.contains(value)) {
                 result.add(UNNAMED_PARAMETER);
             }
@@ -40,6 +40,9 @@ public final class StockTableDefinition implements TableDefinition<StockFields> 
 
     @Override
     public String onConflictColumns() {
-        return StockFields.TICKER.name();
+        return new StringJoiner(COLUMN_DELIMITER)
+                .add(ChartFields.FK_STOCK_ID.name())
+                .add(ChartFields.DATE_TIME.name())
+                .toString();
     }
 }

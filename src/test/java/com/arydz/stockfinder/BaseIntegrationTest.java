@@ -32,6 +32,7 @@ import org.testcontainers.shaded.com.google.common.net.InetAddresses;
 })
 public abstract class BaseIntegrationTest {
 
+    protected final String WEB_URL_PATTERN = "http://localhost:%s%s";
     private static final String JDBC_URL_PATTERN = "jdbc:postgresql://%1$s:%2$d/test_database?loggerLevel=OFF";
 
     @Container
