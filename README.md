@@ -248,4 +248,9 @@ Testcontainers challenges (version 1.17.5):
 
 ### 2.6 Flyway
 Is a version control for databases, helpful with migration (can be done in SQL and Java).
-Since this project already has initialized database, the next SQL script has to have a name with the `V2__` prefix. 
+Since this project already has initialized database, the next SQL script has to have a name with the `V2__` prefix.
+
+### 2.7 Apache Spark
+https://hub.docker.com/r/bitnami/spark/dockerfile
+
+docker build --build-arg spark-version=3.2.2 .

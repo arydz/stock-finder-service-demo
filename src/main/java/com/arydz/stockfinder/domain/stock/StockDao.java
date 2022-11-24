@@ -1,11 +1,11 @@
 package com.arydz.stockfinder.domain.stock;
 
+import com.arydz.stockfinder.domain.common.EnvProperties;
 import com.arydz.stockfinder.domain.common.db.SqlUtils;
 import com.arydz.stockfinder.domain.stock.db.StockEntity;
 import com.arydz.stockfinder.domain.stock.db.StockFields;
 import com.arydz.stockfinder.domain.stock.db.StockTableDefinition;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -21,9 +21,7 @@ class StockDao {
 
     private static final List<StockFields> EXCLUDED_STOCK_FIELDS = List.of(StockFields.MARKET_INDEX_ID);
 
-    @Value("${spring.jpa.properties.hibernate.jdbc.batch_size}")
-    private int batchSize;
-
+    private final EnvProperties properties;
     private final SqlUtils sqlUtils;
     private final StockTableDefinition stockTableDefinition;
 
@@ -32,15 +30,15 @@ class StockDao {
     @Transactional
     public void saveAll(List<StockEntity> entityList) {
 
-        if (batchSize <= 0) {
-            throw new IllegalArgumentException(format("Batch size is %s. Batch processing can't be disabled.", batchSize));
+        if (properties.getBatchSize() <= 0) {
+            throw new IllegalArgumentException(format("Batch size is %s. Batch processing can't be disabled.", properties.getBatchSize()));
         }
 
         String upsertQuery = sqlUtils.prepareUpsert("STOCK", stockTableDefinition, EXCLUDED_STOCK_FIELDS);
 
         jdbcTemplate.batchUpdate(upsertQuery,
                 entityList,
-                batchSize,
+                properties.getBatchSize(),
                 (PreparedStatement ps, StockEntity entity) -> {
                     ps.setString(1, entity.getTicker());
                     ps.setString(2, entity.getTitle());
