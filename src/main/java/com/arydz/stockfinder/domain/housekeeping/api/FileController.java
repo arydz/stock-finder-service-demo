@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @RestController
@@ -18,9 +19,9 @@ public class FileController {
 
     @PostMapping(value = "import", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public String manuallyImport(FileParams importFileParams) {
+    public Mono<String> manuallyImport(FileParams importFileParams) {
 
-        filesService.importFile(importFileParams);
-        return "File imported";
+        filesService.importChartData(importFileParams);
+        return Mono.just("File imported");
     }
 }
