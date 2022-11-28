@@ -9,14 +9,15 @@ import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.AbstractFileHeader;
 import net.lingala.zip4j.model.FileHeader;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -29,17 +30,17 @@ public class DefaultExtractArchiveService implements ExtractArchiveService {
     private final EnvProperties properties;
 
     @Override
-    public String extractZipFile(MultipartFile uploadedZipFile, ChartTimeframeType chartTimeframeType, ExtractionMode extractionMode) {
+    public String extractZipFile(Path temporaryZipPath, ChartTimeframeType chartTimeframeType, ExtractionMode extractionMode) {
 
-        String pathFileName = uploadedZipFile.getName();
+        log.info("About do extract zip file {}", temporaryZipPath);
         String zipExtractionPath = getZipExtractionPath(chartTimeframeType);
-        log.info("About do extract zip file: {} into {}", pathFileName, zipExtractionPath);
         try {
-            ZipFile zipFile = new ZipFile(pathFileName);
+            ZipFile zipFile = new ZipFile(temporaryZipPath.toString());
             extractZipByFolders(zipFile, zipExtractionPath, extractionMode);
         } catch (ZipException e) {
-            throw new IllegalArgumentException(String.format("Couldn't extract zip %s", pathFileName), e);
+            throw new IllegalArgumentException(String.format("Couldn't extract zip %s. Error message: %s", temporaryZipPath, e.getMessage()), e);
         }
+
         return zipExtractionPath;
     }
 
@@ -60,13 +61,22 @@ public class DefaultExtractArchiveService implements ExtractArchiveService {
 
     private void extractZipByFolders(ZipFile zipFile, String pathToExtract, ExtractionMode extractionMode) throws ZipException {
 
-        List<FileHeader> fileHeaders = zipFile.getFileHeaders();
-        flattensZipStructure(zipFile, fileHeaders);
-        excludeDirectories(zipFile, extractionMode, fileHeaders);
+        List<FileHeader> filteredFileHeaderList = prepareListOfHeaders(zipFile, extractionMode);
 
-        for (FileHeader fileHeader : fileHeaders) {
+//        filteredFileHeaderList.stream()
+//                .filter(AbstractFileHeader::isDirectory)
+//                .map(AbstractFileHeader::getFileName)
+//                .forEach(System.out::println);
+
+        log.info("About to extract files");
+        for (FileHeader fileHeader : filteredFileHeaderList) {
+//            boolean isValidFile = !fileHeader.isDirectory() && extractionMode.getExclusion().test(fileHeader);
+//            if (isValidFile) {
+
             if (fileHeader.isDirectory()) {
                 String fileName = fileHeader.getFileName();
+//                String newFileName = flattensPathToExtractedFile(fileName);
+//                zipFile.extractFile(fileName, pathToExtract, newFileName);
                 log.info("Extracting folder from archive: {}", fileName);
                 zipFile.extractFile(fileName, pathToExtract);
             }
@@ -74,14 +84,24 @@ public class DefaultExtractArchiveService implements ExtractArchiveService {
         log.info("Extracted zip file successfully: {}", pathToExtract);
     }
 
-    private void excludeDirectories(ZipFile zipFile, ExtractionMode extractionMode, List<FileHeader> fileHeaders) throws ZipException {
+    private List<FileHeader> prepareListOfHeaders(ZipFile zipFile, ExtractionMode extractionMode) throws ZipException {
+        List<FileHeader> fileHeaderList = zipFile.getFileHeaders();
 
-        for (FileHeader header : fileHeaders) {
-            if (extractionMode.getDirectoryFilter().test(header)) {
-                zipFile.removeFile(header);
-                fileHeaders.remove(header);
-            }
-        }
+        flattensZipStructure(zipFile, fileHeaderList);
+        List<FileHeader> filteredFileHeaderList = excludeDirectories(extractionMode, fileHeaderList);
+        return filteredFileHeaderList;
+    }
+
+    private String flattensPathToExtractedFile(String fileName) {
+        return fileName.replace(ARCHIVE_ROOT_FOLDER, "");
+    }
+
+
+    private List<FileHeader> excludeDirectories(ExtractionMode extractionMode, List<FileHeader> fileHeaders) {
+
+        return fileHeaders.stream()
+                .filter(fh -> extractionMode.getExtractable().test(fh))
+                .collect(Collectors.toList());
     }
 
     private void flattensZipStructure(ZipFile zipFile, List<FileHeader> fileHeaders) {
@@ -107,4 +127,5 @@ public class DefaultExtractArchiveService implements ExtractArchiveService {
             throw new IllegalArgumentException(String.format("Could not prepare archive folder %s", fileName));
         }
     }
+
 }

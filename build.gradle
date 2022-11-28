@@ -42,16 +42,15 @@ dependencies {
     implementation 'org.postgresql:postgresql:42.5.0'
     implementation 'org.flywaydb:flyway-core:9.8.2'
 
-    // todo fix problem with logback and slf4j
-    // Spark
-//    implementation 'org.apache.spark:spark-sql_2.12:3.2.2'
-
     // Utils
     implementation 'com.googlecode.jmapper-framework:jmapper-core:1.6.1.CR2'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
+
+    // Files
     implementation 'net.lingala.zip4j:zip4j:2.11.2'
+    implementation 'com.opencsv:opencsv:5.7.1'
 
     // Tests
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

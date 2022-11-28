@@ -9,16 +9,19 @@ import java.util.function.Predicate;
 @RequiredArgsConstructor
 public enum ExtractionMode {
 
-    NO_EXCLUSION(header -> false),
-    EXCLUDE_JSON_FILES(header -> {
+    NO_EXCLUSION(header -> {
         String fileName = header.getFileName();
-        return header.isDirectory() && fileName.equalsIgnoreCase("json");
+        return header.isDirectory() && (fileName.endsWith("csv/") || header.isDirectory() && fileName.endsWith("json/"));
     }),
-    EXCLUDE_CSV_FILES(header -> {
+    EXCLUDE_JSON_FOLDERS(header -> {
         String fileName = header.getFileName();
-        return header.isDirectory() && fileName.equalsIgnoreCase("csv");
+        return header.isDirectory() && fileName.endsWith("csv/");
+    }),
+    EXCLUDE_CSV_FOLDERS(header -> {
+        String fileName = header.getFileName();
+        return header.isDirectory() && fileName.endsWith("json/");
     });
 
     @Getter
-    private final Predicate<FileHeader> directoryFilter;
+    private final Predicate<FileHeader> extractable;
 }

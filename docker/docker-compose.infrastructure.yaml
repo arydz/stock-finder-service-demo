@@ -51,28 +51,6 @@ services:
       - TESTCONTAINERS_RYUK_DISABLED=true
     network_mode: bridge
 
-
-
-#  TODO spark dockerfile
-#  wyciagac liste zaleznosci w folderze /opt/bitnami/spark/jars
-#  pobierac te zaleznosci osobno
-#  kopiowac te zaleznosci do odpowiedniego folderu
-
-
-
-  spark:
-    image: bitnami/spark
-    user: root
-    networks:
-      stock_finder_net:
-        ipv4_address: 172.28.1.5
-    environment:
-      - SPARK_MASTER_WEBUI_PORT=4040
-    ports:
-      - '4040:4040'
-      - '7077:7077'
-
-
 volumes:
   pgdata:
   pgadmindata:

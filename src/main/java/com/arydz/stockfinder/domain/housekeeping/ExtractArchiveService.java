@@ -1,7 +1,8 @@
 package com.arydz.stockfinder.domain.housekeeping;
 
 import com.arydz.stockfinder.domain.chart.ChartTimeframeType;
-import org.springframework.web.multipart.MultipartFile;
+
+import java.nio.file.Path;
 
 /**
  * Different data vendors provide different bulk data sets (compressed archive files).
@@ -10,5 +11,5 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface ExtractArchiveService {
 
-    String extractZipFile(MultipartFile uploadedZipFile, ChartTimeframeType chartTimeframeType, ExtractionMode extractionMode);
+    String extractZipFile(Path temporaryZipPath, ChartTimeframeType chartTimeframeType, ExtractionMode extractionMode);
 }
