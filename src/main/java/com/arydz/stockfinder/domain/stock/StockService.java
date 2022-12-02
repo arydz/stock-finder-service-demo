@@ -4,6 +4,7 @@ import com.arydz.stockfinder.domain.common.EdgarClient;
 import com.arydz.stockfinder.domain.stock.db.StockEntity;
 import com.arydz.stockfinder.domain.stock.model.EdgarStock;
 import com.arydz.stockfinder.domain.stock.model.FilterStockParams;
+import com.arydz.stockfinder.domain.stock.model.SimpleStock;
 import com.arydz.stockfinder.domain.stock.model.Stock;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-class StockService {
+public class StockService {
 
     private static final String IMPORT_STOCKS_MESSAGE = "%s stocks imported successfully";
 
@@ -69,5 +70,10 @@ class StockService {
                     return repository.findAll(ticker, title, pageRequest);
                 })
                 .map(entityPages -> entityPages.map(stockMapper::mapEntityToStock));
+    }
+
+    public List<SimpleStock> getSimpleStockList() {
+
+        return repository.findAllSimpleStocks();
     }
 }

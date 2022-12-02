@@ -34,7 +34,7 @@ class StockDao {
             throw new IllegalArgumentException(format("Batch size is %s. Batch processing can't be disabled.", properties.getBatchSize()));
         }
 
-        String upsertQuery = sqlUtils.prepareUpsert("STOCK", stockTableDefinition, EXCLUDED_STOCK_FIELDS);
+        String upsertQuery = sqlUtils.prepareUpsert(StockEntity.ENTITY_NAME, stockTableDefinition, EXCLUDED_STOCK_FIELDS);
 
         jdbcTemplate.batchUpdate(upsertQuery,
                 entityList,

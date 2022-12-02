@@ -14,6 +14,9 @@ Features:
 
 **In this project, some packages contain specific description.MD files with descriptions of selected solutions.**
 
+## Code of web project
+https://github.com/arydz/stock-finder-webapp-demo
+
 # License
 This project is licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0 International license.
 
@@ -38,7 +41,21 @@ Required (for Docker) environment variables (PC restart might be required):
 - `PGADMIN_DEFAULT_PASSWORD` for PGadmin
 ```
 
-### 1.3 Login to PgAdmin (optional)
+### 1.3 How to run and use
+1. Run containers from `docker-compose.infrastructure.yaml`
+2. Run containers from `docker-compose.yaml`
+3. In web browser go to http://localhost:4200
+4. Import stock data:
+  - on left side menu, click on `Stock` tab
+  - on upper menu, click `Import Stocks` tab
+  - click on `Import stock data from EDGAR server` button
+5. View imported stocks:
+   - on left side menu, click on `Stock` tab
+   - on upper menu, click `Stock list` tab
+6. Import chart data:
+  - todo
+
+### 1.4 Login to PgAdmin (optional)
 - Open http://localhost:5454/browser/ in browser
 - Login with a credentials: `sf_admin@stockfinder.com` and password setup in your env variable `PGADMIN_DEFAULT_PASSWORD` (1.3 point)
 - Choose `Add New Server`, new wizard window will be shown
@@ -47,8 +64,9 @@ Required (for Docker) environment variables (PC restart might be required):
 - Click on `Save` button
 - From available databases select `stock_finder`
 
-### 1.4 Swagger
+### 1.5 Swagger
 Go to: `http://localhost:8080/webjars/swagger-ui/index.html`
+
 
 # 2. Technical description
 

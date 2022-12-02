@@ -13,7 +13,8 @@ import java.util.List;
  */
 public interface TableDefinition<T> extends Serializable {
 
-    String getTable();
+    String COLUMN_DELIMITER = ", ";
+    String UNNAMED_PARAMETER = "?";
 
     String getColumnsWithUnnamedParametersSqlPart(List<T> excludedColumns);
 

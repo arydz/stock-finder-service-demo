@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public abstract class CandleEntity {
+public abstract class ChartEntity {
 
     @Id
     private Long id;

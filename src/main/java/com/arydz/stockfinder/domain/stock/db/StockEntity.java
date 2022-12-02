@@ -25,7 +25,7 @@ import static com.arydz.stockfinder.domain.stock.db.StockEntity.ENTITY_NAME;
 @Table(name = ENTITY_NAME)
 public class StockEntity {
 
-    static final String ENTITY_NAME = "STOCK";
+    public static final String ENTITY_NAME = "STOCK";
 
     @Id
     @GeneratedValue(generator = "stock_id_seq")

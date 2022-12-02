@@ -1,8 +1,7 @@
 package com.arydz.stockfinder.domain.chart;
 
-import com.arydz.stockfinder.domain.chart.db.CandleDailyEntity;
-import com.arydz.stockfinder.domain.chart.db.CandleHourlyEntity;
-import com.arydz.stockfinder.domain.chart.db.CandleWeeklyEntity;
+import com.arydz.stockfinder.domain.chart.db.ChartDailyEntity;
+import com.arydz.stockfinder.domain.chart.db.ChartHourlyEntity;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Getter;
 
@@ -10,9 +9,8 @@ import lombok.Getter;
 @JsonSerialize(using = ChartTimeframeSerializer.class)
 public enum ChartTimeframeType {
 
-    WEEKLY("Weekly", CandleWeeklyEntity.ENTITY_NAME, CandleWeeklyEntity.class),
-    DAILY("Daily", CandleDailyEntity.ENTITY_NAME, CandleDailyEntity.class),
-    HOURLY("Hourly", CandleHourlyEntity.ENTITY_NAME, CandleHourlyEntity.class);
+    DAILY("Daily", ChartDailyEntity.ENTITY_NAME, ChartDailyEntity.class),
+    HOURLY("Hourly", ChartHourlyEntity.ENTITY_NAME, ChartHourlyEntity.class);
 
     private final String description;
 

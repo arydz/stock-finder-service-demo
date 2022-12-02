@@ -9,10 +9,6 @@ import java.util.function.Predicate;
 @RequiredArgsConstructor
 public enum ExtractionMode {
 
-    NO_EXCLUSION(header -> {
-        String fileName = header.getFileName();
-        return header.isDirectory() && (fileName.endsWith("csv/") || header.isDirectory() && fileName.endsWith("json/"));
-    }),
     EXCLUDE_JSON_FOLDERS(header -> {
         String fileName = header.getFileName();
         return header.isDirectory() && fileName.endsWith("csv/");
