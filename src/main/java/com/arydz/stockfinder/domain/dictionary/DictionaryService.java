@@ -19,10 +19,10 @@ public class DictionaryService {
     public Mono<List<String>> getMarketIndexNameList() {
 
         return Mono.just(marketIndexRepository.findAll())
-                .map(this::mapToMarketIndex);
+                .map(this::mapToMarketIndexName);
     }
 
-    private List<String> mapToMarketIndex(List<MarketIndexEntity> entityList) {
+    private List<String> mapToMarketIndexName(List<MarketIndexEntity> entityList) {
 
         return entityList.stream()
                 .map(marketIndexMapper::mapToMarketIndex)
@@ -30,12 +30,25 @@ public class DictionaryService {
                 .map(MarketIndex::getName)
                 .collect(Collectors.toList());
     }
-
     private int compareByNameLength(MarketIndex o1, MarketIndex o2) {
 
         int length1 = o1.getName().length();
         int length2 = o2.getName().length();
         return length2 - length1;
+    }
+
+    public Mono<List<MarketIndex>> getMarketIndexList() {
+
+        return Mono.just(marketIndexRepository.findAll())
+                .map(this::mapToMarketIndex);
+    }
+
+    private List<MarketIndex> mapToMarketIndex(List<MarketIndexEntity> entityList) {
+
+        return entityList.stream()
+                .map(marketIndexMapper::mapToMarketIndex)
+                .sorted(this::compareByNameLength)
+                .collect(Collectors.toList());
     }
 
 }

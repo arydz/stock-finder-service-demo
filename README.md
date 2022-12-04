@@ -4,7 +4,7 @@ It's a demo of stock finder application (backoffice), which is focusing on:
 - simple integration with external sites (SEC.gov)
 - learning new things (libraries / architectural approaches)
 - implementing effective sql scripts
-- providing unit / integration tests with good coverage (focus on checking valuable logic, not on percent) 
+- providing unit / integration tests with good coverage
 Features:
 - import stocks from EDGAR (Company Filings - SEC.gov)
 - provide list of available stocks
@@ -13,6 +13,10 @@ Features:
 - provide data for drawing candle based charts on web application
 
 **In this project, some packages contain specific description.MD files with descriptions of selected solutions.**
+
+### Missing 
+- part of integration tests for `StockService`
+- integration tests for `ChartService`
 
 ## Code of web project
 https://github.com/arydz/stock-finder-webapp-demo

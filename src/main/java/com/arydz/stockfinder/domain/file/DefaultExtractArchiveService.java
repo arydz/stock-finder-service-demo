@@ -1,4 +1,4 @@
-package com.arydz.stockfinder.domain.housekeeping;
+package com.arydz.stockfinder.domain.file;
 
 import com.arydz.stockfinder.domain.chart.ChartTimeframeType;
 import com.arydz.stockfinder.domain.common.EnvProperties;
@@ -29,7 +29,7 @@ public class DefaultExtractArchiveService implements ExtractArchiveService {
     private final EnvProperties properties;
 
     @Override
-    public String extractZipFile(Path temporaryZipPath, ChartTimeframeType chartTimeframeType, ExtractionMode extractionMode) {
+    public Path extractZipFile(Path temporaryZipPath, ChartTimeframeType chartTimeframeType, ExtractionMode extractionMode) {
 
         log.info("About do extract zip file {}", temporaryZipPath);
         String zipExtractionPath = getZipExtractionPath(chartTimeframeType);
@@ -39,8 +39,7 @@ public class DefaultExtractArchiveService implements ExtractArchiveService {
         } catch (ZipException e) {
             throw new IllegalArgumentException(String.format("Couldn't extract zip %s. Error message: %s", temporaryZipPath, e.getMessage()), e);
         }
-
-        return zipExtractionPath;
+        return Path.of(zipExtractionPath);
     }
 
     private String getZipExtractionPath(ChartTimeframeType vendorChartTimeframe) {

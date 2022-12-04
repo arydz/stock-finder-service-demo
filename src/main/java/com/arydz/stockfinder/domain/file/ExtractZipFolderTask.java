@@ -1,4 +1,4 @@
-package com.arydz.stockfinder.domain.housekeeping;
+package com.arydz.stockfinder.domain.file;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

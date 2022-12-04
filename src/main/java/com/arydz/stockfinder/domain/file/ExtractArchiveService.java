@@ -1,4 +1,4 @@
-package com.arydz.stockfinder.domain.housekeeping;
+package com.arydz.stockfinder.domain.file;
 
 import com.arydz.stockfinder.domain.chart.ChartTimeframeType;
 
@@ -11,5 +11,5 @@ import java.nio.file.Path;
  */
 public interface ExtractArchiveService {
 
-    String extractZipFile(Path temporaryZipPath, ChartTimeframeType chartTimeframeType, ExtractionMode extractionMode);
+    Path extractZipFile(Path temporaryZipPath, ChartTimeframeType chartTimeframeType, ExtractionMode extractionMode);
 }

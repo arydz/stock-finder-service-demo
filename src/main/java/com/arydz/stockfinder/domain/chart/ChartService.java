@@ -1,37 +1,77 @@
 package com.arydz.stockfinder.domain.chart;
 
-import com.arydz.stockfinder.domain.common.EnvProperties;
-import com.arydz.stockfinder.domain.housekeeping.CsvToDatabaseService;
-import com.arydz.stockfinder.domain.housekeeping.ExtractionMode;
+import com.arydz.stockfinder.domain.chart.db.ChartDailyEntity;
+import com.arydz.stockfinder.domain.chart.db.ChartTableDefinition;
+import com.arydz.stockfinder.domain.common.db.CsvToDatabaseService;
+import com.arydz.stockfinder.domain.common.db.SqlUtils;
+import com.arydz.stockfinder.domain.file.ExtractionMode;
+import com.arydz.stockfinder.domain.file.FileService;
+import com.arydz.stockfinder.domain.stock.StockService;
+import com.arydz.stockfinder.domain.stock.model.SimpleStock;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
+import javax.sql.DataSource;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChartService {
 
-    private final EnvProperties envProperties;
+    private final StockService stockService;
     private final CsvToDatabaseService csvToDatabaseService;
-    private final ChartRepository chartRepository;
+    private final SqlUtils sqlUtils;
+    private final JdbcTemplate jdbcTemplate;
+    private final ChartTableDefinition chartTableDefinition;
+    private final FileService fileService;
 
-    public void save(ChartTimeframeType chartTimeframeType, ExtractionMode extractionMode, Set<Path> importableFolderList) {
+    public Mono<Void> importChartData(FilePart file, ChartTimeframeType chartTimeframeType, ExtractionMode extractionMode) {
 
+        Mono<Path> uploadFileMono = fileService.uploadZipFile(Mono.just(file));
 
-        // todo
+        return Mono.zip(uploadFileMono, Mono.just(chartTimeframeType), Mono.just(extractionMode))
+                .flatMap(fileService::extractZipFile)
+                .flatMap(paths -> {
+                    Path zipExtractionPath = paths.getT2();
+                    return fileService.performExtractedFiles(zipExtractionPath, this::save);
+                })
+                .doFinally(signalType -> fileService.deleteTemporaryFiles())
+                .then();
+    }
 
-        List<Path> sp500 = importableFolderList.stream().filter(path -> path.toString().contains("sp500")).collect(Collectors.toList());
+    private void save(Set<Path> importableFolderList) {
 
-        for (Path folderPath : sp500) {
-//        for (Path folderPath : importableFolderList) {
+        List<SimpleStock> simpleStockList = stockService.getSimpleStockList();
 
+        String upsertQuery = sqlUtils.prepareUpsert(ChartDailyEntity.ENTITY_NAME, chartTableDefinition, Collections.emptyList());
+        DataSource dataSource = jdbcTemplate.getDataSource();
+        if (null == dataSource) {
+            throw new IllegalArgumentException("No data source available");
+        }
 
+        try (Connection connection = dataSource.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(upsertQuery)) {
 
-            csvToDatabaseService.run(folderPath);
+            for (Path folderPath : importableFolderList) {
+
+                if (Files.isRegularFile(folderPath)) {
+                    throw new IllegalArgumentException(String.format("Path %s should indicate directory with files and not specific file", folderPath));
+                }
+                csvToDatabaseService.run(simpleStockList, folderPath, preparedStatement);
+            }
+        } catch (SQLException e) {
+            throw new IllegalArgumentException(String.format("Can't prepare SQL statement. Details: %s", e.getMessage()));
         }
     }
 }
