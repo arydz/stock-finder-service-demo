@@ -1,4 +1,4 @@
-package com.arydz.stockfinder.domain.stock.model;
+package com.arydz.stockfinder.domain.stock.api;
 
 import com.arydz.stockfinder.domain.common.api.PageableParams;
 import lombok.AllArgsConstructor;

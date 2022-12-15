@@ -1,5 +1,7 @@
 package com.arydz.stockfinder.domain.dictionary;
 
+import com.arydz.stockfinder.domain.chart.ChartTimeframeType;
+import com.arydz.stockfinder.domain.file.ExtractionMode;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,5 +22,17 @@ public class DictionaryController {
     @GetMapping("/marketIndexName")
     public Mono<List<String>> getMarketIndexList() {
         return dictionaryService.getMarketIndexNameList();
+    }
+
+    @GetMapping("/chartTimeframeType")
+    public Mono<ChartTimeframeType[]> getChartTimeframeTypeNameList() {
+
+        return dictionaryService.getChartTimeframeTypes();
+    }
+
+    @GetMapping("/extractionMode")
+    public Mono<ExtractionMode[]> getExtractionModeNameList() {
+
+        return dictionaryService.getExtractionModes();
     }
 }

@@ -1,19 +1,25 @@
 # What is this project about?
 It's a demo of stock finder application (backoffice), which is focusing on:
-- Spring and Spark integration
+- Spring WebFlux
 - simple integration with external sites (SEC.gov)
 - learning new things (libraries / architectural approaches)
 - implementing effective sql scripts
-- providing unit / integration tests with good coverage (focus on checking valuable logic, not on percent) 
+- providing unit / integration tests with good coverage
 Features:
 - import stocks from EDGAR (Company Filings - SEC.gov)
 - provide list of available stocks
 - find stocks from the available database
 - import candle data from filesystem
 - provide data for drawing candle based charts on web application
-- todo...
 
 **In this project, some packages contain specific description.MD files with descriptions of selected solutions.**
+
+### Missing 
+- part of integration tests for `Stock domain`
+- integration tests for `Chart domain`
+
+## Code of web project
+https://github.com/arydz/stock-finder-webapp-demo
 
 # License
 This project is licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0 International license.
@@ -25,25 +31,39 @@ This project is licensed under the terms of the Creative Commons Attribution-Sha
 - Gradle 6.8.2
 - Docker (Docker Compose)
   - PostgreSQL (with admin)
-  - Apache Spark
 
 ### 1.2 Set environment variables
-For linux based. In your /etc/environment add environment variable for Spark Home dir
+For linux based. In your /etc/environment add environment variable for:
 ```text
 JAVA_HOME="/home/${user}/libraries/java"
-MAVEN_HOME="/home/${user}/libraries/maven"
 GRADLE_HOME="/home/${user}/libraries/gradle"
-SPARK_HOME="/home/${user}/utils/spark-3.3.0-bin-hadoop3"
-PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:$JAVA_HOME/bin:$GRADLE_HOME/bin:$SPARK_HOME/bin"
+PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:$JAVA_HOME/bin:$GRADLE_HOME/"
 ```
-Where $SPARK_HOME is required when working with gradle scripts and docker
 Required (for Docker) environment variables (PC restart might be required):
 ```text
 - `POSTGRES_PASSWORD` for Postgres
 - `PGADMIN_DEFAULT_PASSWORD` for PGadmin
 ```
 
-### 1.3 Login to PgAdmin (optional)
+### 1.3 How to run and use
+1. Run containers from `docker-compose.infrastructure.yaml`
+2. Run containers from `docker-compose.yaml`
+3. In web browser go to http://localhost:4200
+4. Import stock data:
+  - on left side menu, click on `Stock` tab
+  - on upper menu, click `Import Stocks` tab
+  - click on `Import stock data from EDGAR server` button
+5. View imported stocks:
+   - on left side menu, click on `Stock` tab
+   - on upper menu, click `Stock list` tab
+6. Import chart data:
+   - on left side menu, click on `Stock` tab
+   - on upper menu, click `Import Charts` tab
+   - select import type, file, chart timeframe and extraction mode of file
+   - click on submit button
+   - appropriate notification appears after some time when request is finished
+
+### 1.4 Login to PgAdmin (optional)
 - Open http://localhost:5454/browser/ in browser
 - Login with a credentials: `sf_admin@stockfinder.com` and password setup in your env variable `PGADMIN_DEFAULT_PASSWORD` (1.3 point)
 - Choose `Add New Server`, new wizard window will be shown
@@ -52,8 +72,9 @@ Required (for Docker) environment variables (PC restart might be required):
 - Click on `Save` button
 - From available databases select `stock_finder`
 
-### 1.4 Swagger
+### 1.5 Swagger
 Go to: `http://localhost:8080/webjars/swagger-ui/index.html`
+
 
 # 2. Technical description
 
@@ -248,4 +269,13 @@ Testcontainers challenges (version 1.17.5):
 
 ### 2.6 Flyway
 Is a version control for databases, helpful with migration (can be done in SQL and Java).
-Since this project already has initialized database, the next SQL script has to have a name with the `V2__` prefix. 
+Since this project already has initialized database, the next SQL script has to have a name with the `V2__` prefix.
+
+### 2.7 (Currently deferred) Apache Spark
+Ultimately this project should be integrated also with the `Apache Spark` cluster set on Docker.
+But, because `Spring WebFlux` doesn't provide the required implementations, this step has to be postponed for now.
+Recap:
+- there will be required creating new service with `Spring Web` dependency, that will be responsible for reading extracted zip files and storing chart data in SQL database
+- for now, instead of using Spark-ready API (reading CSV files), this service will be responsible for reading files and storing chart data in the SQL database
+- in typical real-world applications, it makes sense to move logic (with heavy computations) into separate microservices 
+- although `spring-boot-starter-web` could be added next to WebFlux dependency, and `SpringApplication.setWebApplicationType(WebApplicationType.REACTIVE)` could be configured, this approach is not desired. Mixing those two libraries could make a lot of harm during the application development
