@@ -33,7 +33,7 @@ pipeline {
                         -Djib.to.image=${SERVICE_IMAGE_REGISTRY} \
                         -Djib.to.auth.username=${DOCKER_HUB_USR} \
                         -Djib.to.auth.password=${DOCKER_HUB_PSW} \
-                        -Djib.container.jvmFlags=-Dsf.database.host="${SF_DATABASE_HOST}",-Dspring.datasource.password="${SPRING_DATASOURCE_PASSWORD}" -sf.source.path=/tmp/sf'
+                        -Djib.container.jvmFlags=-Dsf.database.host="${SF_DATABASE_HOST}",-Dspring.datasource.password="${SPRING_DATASOURCE_PASSWORD}",-Dsf.source.path="/tmp/sf"'
                 }
             }
         }
