@@ -127,7 +127,7 @@ All services are in the scope of the same (custom) network (apart from Jenkins a
 #### 2.3.2 Build images and run Docker containers
 First, build the application and generate a docker image with this command:
 - `gradle clean build`
-- `gradle jibDockerBuild -Djib.container.jvmFlags=-Dsf.database.host="<some-host>",-Dspring.datasource.password="<database-password>"`
+- `gradle jibDockerBuild -Djib.container.jvmFlags=-Dsf.database.host="<database-host>",-Dspring.datasource.password="<database-password>",-Dsf.source.path=<where-to-upload-file>`
   - thanks to that, those properties don't have to be put in container closure:
   ```text
       container {
